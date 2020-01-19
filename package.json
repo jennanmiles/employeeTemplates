@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/jennanmiles/employeeTemplates#readme",
   "dependencies": {
-    "inquirer": "^7.0.3"
+    "axios": "^0.19.1",
+    "inquirer": "^7.0.3",
+    "jest": "^24.9.0"
   }
 }
