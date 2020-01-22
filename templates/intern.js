@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Interns</title>
-</head>
-<body>
-    
-</body>
-</html>
+function internTemplate(data) {
+    return `<div class="card">
+        <div class="name">${data.name}</div>
+        <div class="info">
+            <i class="fas fa-graduation-cap"></i>
+            Intern
+        </div>
+        <div class="info">ID: ${data.id}</div>
+        <div class="info">Email: <a href="mailto:${data.email}">${data.email}</a></div>
+        <div class="info">School: ${data.school}</div>
+    </div>`
+}
+module.exports = internTemplate;

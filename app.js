@@ -1,15 +1,25 @@
 // install packages
 const fs = require('fs');
-const axios = require('axios');
 const inquirer = require('inquirer');
-const generateHTML = require("./templates/generateHTML.js");
+const generateHTML = require('./templates/generateHTML.js');
+
+// pull in constuctor functions
+const Manager = require('./lib/Manager');
+const Intern = require('./lib/Intern');
+const Engineer = require('./lib/Engineer');
+
+// templates
+const managerCard = require('./templates/manager');
+const internCard = require('./templates/intern');
+const engineerCard = require('./templates/engineer');
+
 // test package
 const jest = require('jest');
-
+// empty arrays
 let answers = {
-    Manager: [],
-    Engineer: [],
-    Intern: []
+    managers: [],
+    engineers: [],
+    interns: []
 }
 
 // prompt for employee info
@@ -26,22 +36,20 @@ function promptUser() {
             ]
         }
     ]).then(function (data) {
-
         console.log(data);
-
-        // call functions with inquirer
+        // allow multiple entries
         if (data.role == 'engineer') {
             returnEngineer();
         } else if (data.role == 'intern') {
             returnIntern();
         } else if (data.role == 'manager') {
-            returnManger();
+            returnManager();
         }
     });
 }
 
 // questions for manager
-function returnManger() {
+function returnManager() {
     return inquirer.prompt([
         {
             type: "input",
@@ -64,7 +72,7 @@ function returnManger() {
             message: "What is your office number?"
         },
         {
-            type: "checkbox",
+            type: "list",
             name: "continue",
             message: "Would you like to enter another employee?",
             choices: [
@@ -74,11 +82,13 @@ function returnManger() {
         }
     ]).then(data => {
         // declare new constructor function
-
+        let managerEntry = new Manager(data.name,data.id,data.email,data.officeNumber);
         // push into array here
-        answers.Manager.push(data);
+        answers.managers.push(data);
         if (data.continue == "yes") {
             promptUser();
+        } else {
+            generate();
         }
     });
 }
@@ -107,7 +117,7 @@ function returnEngineer() {
             message: "What is your GitHub username?"
         },
         {
-            type: "checkbox",
+            type: "list",
             name: "continue",
             message: "Would you like to enter another employee?",
             choices: [
@@ -117,10 +127,13 @@ function returnEngineer() {
         }
     ]).then(data => {
         // declare new constructor function
-
-        answers.Engineer.push(data);
+        let newEngineer = new Engineer(data.name,data.id,data.email,data.github);
+        // push to empty array
+        answers.engineers.push(data);
         if (data.continue == "yes") {
             promptUser();
+        } else {
+            generate();
         }
     });
 }
@@ -149,7 +162,7 @@ function returnIntern() {
             message: "What school do you go to?"
         },
         {
-            type: "checkbox",
+            type: "list",
             name: "continue",
             message: "Would you like to enter another employee?",
             choices: [
@@ -159,31 +172,45 @@ function returnIntern() {
         }
     ]).then(data => {
         // declare new constructor function
-
-        answers.Intern.push(data);
+        let newIntern = new Intern(data.name,data.id,data.email,data.school);
+        // push to empty array
+        answers.interns.push(data);
         if (data.continue == "yes") {
             promptUser();
         } else {
-            console.log(answers);
+            generate();
         }
     });
 }
 
-// call prompt user and pass data 
-promptUser();
-
-
+// populate & generate html 
+function generate() {
+    let cards = '';
+    // loop through data and populate html - foreach
+    answers.managers.forEach(data => 
+        cards += managerCard(data)
+    );
+    answers.engineers.forEach( data =>
+        cards += engineerCard(data)
+    );
+    answers.interns.forEach( data =>
+        cards += internCard(data)
+    );
 
     //create html
-    // let html = generateHTML(data);
-    // writeToFile(html);
+    let html = generateHTML(cards);
+    writeToFile(html);
 
-    // function writeToFile(html) {
-    //     fs.writeFile('./output/team.html', html, function(err) {
-    //         if (err) {
-    //             return console.log(err);
-    //         }
-    //         console.log("success!");
-    //     });
-    // }
+    function writeToFile(html) {
+        fs.writeFile('./output/team.html', html, function(err) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("success!");
+        });
+    }
+}
 
+
+// call prompt user and pass data 
+promptUser();
